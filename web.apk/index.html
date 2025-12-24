@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SİSTEM_KRİTİK_HATA</title>
+    <style>
+        /* --- CSS BÖLÜMÜ --- */
+        * { cursor: none !important; margin: 0; padding: 0; }
+        body { background: #000; overflow: hidden; font-family: sans-serif; }
+
+        /* GİRİŞ EKRANI */
+        #intro-screen { 
+            height: 100vh; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; 
+            background: radial-gradient(circle, #1a0000 0%, #000 100%);
+        }
+        .scary-title { color: #f00; font-size: 50px; font-weight: bold; text-shadow: 0 0 15px #f00; font-family: 'Courier New'; }
+        #start-btn { 
+            margin-top: 20px; padding: 15px 40px; background: transparent; 
+            border: 2px solid #f00; color: #f00; font-weight: bold; 
+        }
+
+        /* OYUN ALANI */
+        #oyun-alani { width: 100vw; height: 100vh; position: relative; }
+        #hedef { width: 30px; height: 30px; background: #f00; border-radius: 50%; position: absolute; box-shadow: 0 0 15px #f00; }
+        .glitch-popup { 
+            position: absolute; background: #000; border: 1px solid red; 
+            color: #f00; padding: 10px; font-family: monospace; z-index: 1000;
+        }
+
+        /* DEV MAVİ EKRAN */
+        #mavi-ekran { 
+            background: #0078d7; color: #fff; height: 100vh; width: 100vw;
+            position: fixed; top: 0; left: 0; display: flex; align-items: center; 
+            justify-content: flex-start; font-family: 'Segoe UI', Tahoma, sans-serif; 
+            padding-left: 10%; box-sizing: border-box;
+        }
+        .bsod-face { font-size: 180px; margin-bottom: 20px; }
+        .bsod-text { font-size: 40px; line-height: 1.4; width: 80%; }
+        .percent-line { margin-top: 40px; font-size: 35px; }
+
+        /* SİYAH GEÇİŞ */
+        #siyah-ekran { background: #000; width: 100vw; height: 100vh; position: fixed; top: 0; z-index: 9999; }
+
+        /* FİNAL EKRANI (DÜŞÜK KALİTE) */
+        #final-ekran { 
+            background: #eee; width: 100vw; height: 100vh; 
+            display: flex; justify-content: center; align-items: center;
+            position: relative; filter: blur(1.5px) contrast(140%);
+        }
+        .noise { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: url('https://media.giphy.com/media/oEI9uWUicGLeU/giphy.gif'); 
+            opacity: 0.1; pointer-events: none; 
+        }
+        .basik-yazi {
+            color: #111; font-size: 75px; font-weight: 900;
+            transform: scaleY(0.45) scaleX(1.4); 
+            text-align: center; font-family: 'Impact', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="intro-screen">
+        <div class="scary-title">SİSTEM TEHLİKEDE</div>
+        <p style="color: #444; margin-top: 10px;">Kritik dosyalar bozuluyor...</p>
+        <button id="start-btn" onclick="baslat()">KURTARMAYI DENE</button>
+    </div>
+
+    <div id="oyun-alani" style="display:none">
+        <div id="hedef"></div>
+    </div>
+
+    <div id="mavi-ekran" style="display:none">
+        <div>
+            <div class="bsod-face">:(</div>
+            <div class="bsod-text">
+                <p>Windows bir sorunla karşılaştı ve yeniden başlatılması gerekiyor. Sadece bazı hata bilgileri toplanıyor, ardından yeniden başlatılacak.</p>
+                <p class="percent-line">%<span id="yuzde">0</span> tamamlandı</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="siyah-ekran" style="display:none"></div>
+
+    <div id="final-ekran" style="display:none">
+        <div class="noise"></div>
+        <div class="basik-yazi">your pc is trash go to fix him :)</div>
+    </div>
+
+    <script>
+        /* --- JAVASCRIPT BÖLÜMÜ --- */
+        let yuzdeCount = 0;
+        const mesajlar = ["HACKED", "لا مفر", "SYSTEM DEAD", "死", "ERİŞİM ENGELLENDİ", "तुम्हारी आत्मा"];
+
+        function baslat() {
+            document.getElementById('intro-screen').style.display = 'none';
+            document.getElementById('oyun-alani').style.display = 'block';
+            
+            // Tam ekran isteği
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
+
+            hareket();
+            
+            // Korkunç popup döngüsü
+            const popupTimer = setInterval(() => {
+                if(document.getElementById('oyun-alani').style.display === 'block') {
+                    const p = document.createElement('div');
+                    p.className = 'glitch-popup';
+                    p.style.left = Math.random() * 80 + "vw";
+                    p.style.top = Math.random() * 80 + "vh";
+                    p.innerHTML = "⚠️ " + mesajlar[Math.floor(Math.random()*mesajlar.length)];
+                    document.body.appendChild(p);
+                } else {
+                    clearInterval(popupTimer);
+                }
+            }, 400);
+
+            // 7 saniye sonra mavi ekran
+            setTimeout(maviEkranAc, 7000);
+        }
+
+        function hareket() {
+            const h = document.getElementById('hedef');
+            h.style.left = Math.random() * 90 + "vw";
+            h.style.top = Math.random() * 90 + "vh";
+        }
+
+        document.getElementById('hedef').addEventListener('mouseover', hareket);
+
+        function maviEkranAc() {
+            document.getElementById('oyun-alani').style.display = 'none';
+            document.querySelectorAll('.glitch-popup').forEach(e => e.remove());
+            document.getElementById('mavi-ekran').style.display = 'flex';
+
+            let itv = setInterval(() => {
+                yuzdeCount += Math.floor(Math.random() * 5) + 1;
+                if(yuzdeCount >= 100) {
+                    yuzdeCount = 100;
+                    clearInterval(itv);
+                    setTimeout(siyahGecis, 1000);
+                }
+                document.getElementById('yuzde').innerText = yuzdeCount;
+            }, 250);
+        }
+
+        function siyahGecis() {
+            document.getElementById('mavi-ekran').style.display = 'none';
+            document.getElementById('siyah-ekran').style.display = 'block';
+            setTimeout(finalEkran, 2000);
+        }
+
+        function finalEkran() {
+            document.getElementById('siyah-ekran').style.display = 'none';
+            document.getElementById('final-ekran').style.display = 'flex';
+            
+            // ÇIĞLIK SESİ
+            try {
+                const a = new (window.AudioContext || window.webkitAudioContext)();
+                const o = a.createOscillator();
+                o.type = 'sawtooth';
+                o.frequency.setValueAtTime(1600, a.currentTime);
+                o.connect(a.destination);
+                o.start();
+                
+                setTimeout(() => {
+                    o.stop();
+                    location.reload();
+                }, 20000);
+            } catch(e) {
+                console.log("Ses çalınamadı.");
+                setTimeout(() => location.reload(), 20000);
+            }
+        }
+    </script>
+</body>
+</html>
